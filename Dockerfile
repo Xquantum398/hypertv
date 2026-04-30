@@ -1,4 +1,4 @@
-# Dockerfile per TVProxy - Server Proxy con Gunicorn
+# Dockerfile per HuggingFace Spaces - TVProxy con Gunicorn
 
 # 1. Usa l'immagine base ufficiale di Python 3.12 slim
 FROM python:3.12-slim
@@ -13,29 +13,29 @@ RUN apt-get update && apt-get install -y \
 # 3. Imposta la directory di lavoro
 WORKDIR /app
 
-# 4. Copia il codice dell'applicazione
-COPY . .
+# 4. Clona il repository da GitHub
+RUN git clone https://github.com/Xquantum398/Xquantum398.git .
 
-# 6. Aggiorna pip e installa le dipendenze senza cache
+# 5. Aggiorna pip e installa le dipendenze senza cache
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 7. Espone la porta 7860 per Gunicorn
+# 6. Espone la porta 7860 per HuggingFace Spaces
 EXPOSE 7860
 
-# 8. Comando per avviare Gunicorn ottimizzato per proxy server
-#    - 4 worker per gestire più clienti
+# 7. Comando per avviare Gunicorn ottimizzato per HuggingFace Spaces
+#    - 2 worker (limite per Spaces gratuiti)
 #    - Worker class sync (più stabile per proxy HTTP)
 #    - Timeout adeguati per streaming
 #    - Logging su stdout/stderr
 CMD ["gunicorn", "app:app", \
-     "-w", "4", \
+     "-w", "2", \
      "--worker-class", "sync", \
      "-b", "0.0.0.0:7860", \
      "--timeout", "120", \
      "--keep-alive", "5", \
-     "--max-requests", "1000", \
-     "--max-requests-jitter", "100", \
+     "--max-requests", "500", \
+     "--max-requests-jitter", "50", \
      "--access-logfile", "-", \
      "--error-logfile", "-", \
      "--log-level", "info"]
